@@ -8,24 +8,27 @@ import { AnalysisResult, CleanlinessViolation, ErgonomicsIssue } from '@shared/t
 const ANALYSIS_MODEL = 'gemini-1.5-flash'; // Lock to stable model name
 
 let genAI: GoogleGenerativeAI | null = null
+let modelCache: ReturnType<GoogleGenerativeAI['getGenerativeModel']> | null = null
+
 function getModel() {
   if (!genAI) {
-    // Explicitly using 'v1' for the stable model versions to avoid 404 errors
     genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!, {
       apiVersion: 'v1'
     })
     console.log(`[Gemini Client] Initialized with apiVersion: 'v1'`)
   }
-  console.log(`[Gemini Client] Accessing model: ${ANALYSIS_MODEL}`);
-  return genAI.getGenerativeModel({ 
+  if (modelCache) return modelCache;
+
+  modelCache = genAI.getGenerativeModel({ 
     model: ANALYSIS_MODEL,
     generationConfig: {
-      temperature: 0.1, // Slight temperature can actually help the model "think" better than pure 0
+      temperature: 0.1,
       topP: 0.95,
       topK: 40,
       responseMimeType: "application/json",
     }
   });
+  return modelCache;
 }
 
 const ANALYSIS_PROMPT = `Analyze this hospital workspace image for compliance. Check:
@@ -99,6 +102,10 @@ export async function analyzeWorkspaceImage(imagePath: string) {
         },
       },
     ])
+
+    if (!result.response) {
+      throw new Error('The AI service returned an empty response. This may be due to safety filters.');
+    }
 
     const response = await result.response
     text = response.text().trim()

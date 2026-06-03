@@ -2,6 +2,7 @@ import express, { Express, Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import multer from 'multer'
 import fs from 'fs'
+import path from 'path'
 import dotenv from 'dotenv'
 import { reportGenerator } from './services/reportGenerator'
 import { analyzeWorkspaceImage } from './services/analysisService'
@@ -19,7 +20,7 @@ if (!apiKey) {
 
 const app: Express = express()
 const PORT = process.env.PORT || 3000
-const uploadDir = 'temp/uploads'
+const uploadDir = path.join(process.cwd(), 'temp', 'uploads')
 
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true })
 
@@ -60,19 +61,36 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    apiConfigured: !!process.env.GEMINI_API_KEY,
+    environment: process.env.NODE_ENV || 'development'
+  })
+})
 
 app.post('/api/upload', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  res.json({ success: true, filePath: req.file.path, filename: req.file.filename })
+  // Return only the relative path for security and portability
+  const relativePath = path.relative(process.cwd(), req.file.path);
+  res.json({ success: true, filePath: relativePath, filename: req.file.filename })
 })
 
 app.post('/api/analyze', async (req, res) => {
   const { imagePath } = req.body
   if (!imagePath) return res.status(400).json({ error: 'Image path required' })
+
+  // Security: Prevent path traversal by ensuring the path is within the upload directory
+  const absolutePath = path.resolve(process.cwd(), imagePath)
+  if (!absolutePath.startsWith(uploadDir)) {
+    return res.status(403).json({ error: 'Unauthorized file access' })
+  }
+
   try {
     // Perform AI analysis
-    const analysisResult = await analyzeWorkspaceImage(imagePath)
+    const analysisResult = await analyzeWorkspaceImage(absolutePath)
     res.json({ success: true, data: analysisResult })
   } catch (error) {
     console.error('Analysis error:', error)
@@ -80,10 +98,11 @@ app.post('/api/analyze', async (req, res) => {
       error: error instanceof Error ? error.message : 'Analysis failed',
     })
   } finally {
-    // Privacy compliance: Delete the temporary file immediately after processing
+    // Privacy compliance: Ensure the file is removed even if analysis fails
     try {
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath)
+      if (absolutePath && fs.existsSync(absolutePath)) {
+        await fs.promises.unlink(absolutePath)
+        console.log(`[Cleanup] Successfully removed temporary file: ${absolutePath}`)
       }
     } catch (cleanupError) {
       console.error('Cleanup warning (image file was not removed):', cleanupError)
