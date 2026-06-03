@@ -13,7 +13,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
   console.error('❌ ERROR: GEMINI_API_KEY is missing from process.env. Check your .env file.');
 } else {
-  const maskedKey = `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}`;
+  const maskedKey = apiKey.length > 8 ? `${apiKey.substring(0, 4)}...${apiKey.substring(apiKey.length - 4)}` : '****';
   console.log(`✅ GEMINI_API_KEY loaded successfully: ${maskedKey}`);
 }
 
