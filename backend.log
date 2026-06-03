@@ -343,3 +343,10 @@ To fix this, kill the process using port 5177 or change the PORT in your .env fi
 c✅ GEMINI_API_KEY loaded successfully: AQ.A...1XCA
 ✓ Backend running on port 5177
 ✓ Testing link: http://localhost:5177/api/health
+4:29:21 PM [tsx] change in ./src\services\analysisService.ts Restarting...
+c✅ GEMINI_API_KEY loaded successfully: AQ.A...1XCA
+
+❌ Error: Port 5177 is already in use.
+This usually means another instance of the server is still running.
+To fix this, kill the process using port 5177 or change the PORT in your .env file.
+

@@ -9,3 +9,6 @@ backend/temp/
 
 # Build outputs
 dist/
+
+# Logs
+*.log

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import crypto from 'crypto'
 import { promises as fs } from 'fs'
 import { AnalysisResult, CleanlinessViolation, ErgonomicsIssue } from '@shared/types'
 // Build the client lazily. If constructed at module load it would capture
@@ -157,7 +158,7 @@ export async function analyzeWorkspaceImage(imagePath: string) {
   });
 
   return {
-    requestId: `req-${Date.now()}`,
+    requestId: `req-${crypto.randomUUID()}`,
     ...parsedResult,
     timestamp: Date.now(),
   }
