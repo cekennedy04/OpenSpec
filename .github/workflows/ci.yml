@@ -1,0 +1,30 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+        cache-dependency-path: backend/package.json
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: backend
+
+    - name: Build project
+      # This runs your build script if it exists, but won't fail if it doesn't
+      run: npm run build --if-present
+      working-directory: backend

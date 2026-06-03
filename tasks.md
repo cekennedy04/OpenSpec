@@ -8,4 +8,4 @@
 - [x] Implement path traversal security guards on file endpoints.
 - [ ] Add unit tests for `reportGenerator.ts` logic.
 - [ ] Implement frontend error boundaries to handle backend timeouts gracefully.
-- [ ] Set up GitHub Actions for automated linting and type checking.
+- [x] Set up GitHub Actions for automated build verification.

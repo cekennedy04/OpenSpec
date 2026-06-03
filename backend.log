@@ -350,3 +350,10 @@ To fix this, kill the process using port 5177 or change the PORT in your .env fi
 This usually means another instance of the server is still running.
 To fix this, kill the process using port 5177 or change the PORT in your .env file.
 
+4:31:02 PM [tsx] change in ./src\services\analysisService.ts Rerunning...
+c✅ GEMINI_API_KEY loaded successfully: AQ.A...1XCA
+
+❌ Error: Port 5177 is already in use.
+This usually means another instance of the server is still running.
+To fix this, kill the process using port 5177 or change the PORT in your .env file.
+

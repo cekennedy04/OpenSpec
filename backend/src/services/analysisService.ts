@@ -13,6 +13,12 @@ let modelCache: ReturnType<GoogleGenerativeAI['getGenerativeModel']> | null = nu
 
 function getModel() {
   if (!genAI) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error(
+        'GEMINI_API_KEY is missing. Ensure it is set in your environment variables.'
+      )
+    }
+
     genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!, {
       apiVersion: 'v1'
     })
@@ -67,12 +73,6 @@ function detectMediaType(buffer: Buffer): SupportedMediaType | null {
 }
 
 export async function analyzeWorkspaceImage(imagePath: string) {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error(
-      'GEMINI_API_KEY is not configured on the server. Set a valid key in backend/.env.'
-    )
-  }
-
   let imageData: Buffer
   try {
     imageData = await fs.readFile(imagePath)
