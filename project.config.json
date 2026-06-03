@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "name": "WorkSpaceRx",
+  "description": "AI-powered hospital workspace compliance checker",
+  "projectType": "mobile-web",
+  "framework": "React",
+  "backend": "Node.js/Express",
+  "buildTool": "Vite",
+  "styling": "Tailwind CSS",
+  "testing": "Vitest",
+  "paths": {
+    "frontend": "./frontend",
+    "backend": "./backend",
+    "shared": "./shared"
+  },
+  "features": [
+    "camera-capture",
+    "image-upload",
+    "compliance-analysis",
+    "report-generation",
+    "report-export"
+  ]
+}

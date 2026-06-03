@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Environment variables (DO NOT REMOVE THIS)
+.env
+
+# Temporary uploads
+backend/temp/
+
+# Build outputs
+dist/
